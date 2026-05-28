@@ -398,15 +398,17 @@ with right:
         st.subheader(f"구성 옵션 — {sel}")
         comps = st.session_state.set_config[sel]
 
-        hc1, hc2, hc3, hc4, hc5 = st.columns([1, 4, 2, 2, 1])
-        with hc1: st.caption("순서")
-        with hc2: st.caption("구성 옵션명")
-        with hc3: st.caption("등록일")
-        with hc4: st.caption("저장")
+        hc1, hc2, hc3, hc4, hc5, hc6, hc7 = st.columns([1, 4, 2, 2, 2, 2, 1])
+        with hc1: st.caption("수량")
+        with hc2: st.caption("구성 품목명")
+        with hc3: st.caption("중량")
+        with hc4: st.caption("옵션")
+        with hc5: st.caption("등록일")
+        with hc6: st.caption("저장")
         st.divider()
 
         for i, comp in enumerate(comps):
-            rc1, rc2, rc3, rc4, rc5 = st.columns([1, 4, 2, 2, 1])
+            rc1, rc2, rc3, rc4, rc5, rc6, rc7 = st.columns([1, 4, 2, 2, 2, 2, 1])
             with rc1:
                 new_qty = st.number_input("수량", min_value=1, value=comp.get("qty", 1),
                                            key=f"qty_{sel}_{i}", label_visibility="collapsed")
@@ -414,32 +416,46 @@ with right:
                 new_nm = st.text_input("품목명", value=comp.get("name", ""),
                                         key=f"nm_{sel}_{i}", label_visibility="collapsed")
             with rc3:
-                st.caption(datetime.today().strftime("%Y-%m-%d"))
+                new_weight = st.text_input("중량", value=comp.get("weight", ""),
+                                            placeholder="예: 250g",
+                                            key=f"wt_{sel}_{i}", label_visibility="collapsed")
             with rc4:
+                new_option = st.text_input("옵션", value=comp.get("option", ""),
+                                            placeholder="옵션(선택)",
+                                            key=f"op_{sel}_{i}", label_visibility="collapsed")
+            with rc5:
+                st.caption(datetime.today().strftime("%Y-%m-%d"))
+            with rc6:
                 if st.button("저장", key=f"csave_{sel}_{i}", use_container_width=True):
                     comps[i] = {"name": new_nm, "qty": int(new_qty),
-                                 "weight": comp.get("weight",""), "option": comp.get("option","")}
+                                 "weight": new_weight.strip(), "option": new_option.strip()}
                     save_set_config(st.session_state.set_config)
                     st.success("저장!")
-            with rc5:
+            with rc7:
                 if st.button("삭제", key=f"cdel_{sel}_{i}", use_container_width=True):
                     comps.pop(i)
                     save_set_config(st.session_state.set_config)
                     st.rerun()
 
         st.divider()
-        na1, na2, na3 = st.columns([1, 5, 1])
+        na1, na2, na3, na4, na5 = st.columns([1, 4, 2, 2, 1])
         with na1:
             add_qty = st.number_input("수량", min_value=1, value=1,
                                        key=f"addqty_{sel}", label_visibility="collapsed")
         with na2:
-            add_nm = st.text_input("품목명", placeholder="구성 옵션명",
+            add_nm = st.text_input("품목명", placeholder="구성 품목명",
                                     key=f"addnm_{sel}", label_visibility="collapsed")
         with na3:
+            add_weight = st.text_input("중량", placeholder="예: 250g",
+                                        key=f"addwt_{sel}", label_visibility="collapsed")
+        with na4:
+            add_option = st.text_input("옵션", placeholder="옵션(선택)",
+                                        key=f"addop_{sel}", label_visibility="collapsed")
+        with na5:
             if st.button("추가", key=f"addcomp_{sel}", use_container_width=True):
                 if add_nm.strip():
                     comps.append({"name": add_nm.strip(), "qty": int(add_qty),
-                                   "weight": "", "option": ""})
+                                   "weight": add_weight.strip(), "option": add_option.strip()})
                     save_set_config(st.session_state.set_config)
                     st.rerun()
 
