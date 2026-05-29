@@ -13,6 +13,13 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 from openpyxl import Workbook
+
+# GitHub 영구 저장소
+try:
+    from github_storage import gh_load, gh_save
+    _USE_GITHUB = True
+except Exception:
+    _USE_GITHUB = False
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
@@ -47,6 +54,8 @@ CONFIG_PATH = Path("set_config_sabang.json")
 # 세트 설정 로드/저장
 # ──────────────────────────────────────────────
 def load_set_config() -> dict:
+    if _USE_GITHUB:
+        return gh_load("set_config_sabang.json", {})
     if CONFIG_PATH.exists():
         try:
             return json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
@@ -55,7 +64,10 @@ def load_set_config() -> dict:
     return {}
 
 def save_set_config(cfg: dict):
-    CONFIG_PATH.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
+    if _USE_GITHUB:
+        gh_save("set_config_sabang.json", cfg)
+    else:
+        CONFIG_PATH.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
 
 # ──────────────────────────────────────────────
 # 세트 분리
